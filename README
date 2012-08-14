@@ -1,0 +1,10 @@
+This project develops a C++ library implementing the compressed string 
+dictionaries described in:
+
+==========================================================================
+  "Compressed String Dictionaries"
+  Nieves R. Brisaboa, Rodrigo Canovas, Francisco Claude, 
+  Miguel A. Martinez-Prieto and Gonzalo Navarro.
+  10th Symposium on Experimental Algorithms (SEA'2011), p.136-147, 2011.
+==========================================================================
+
