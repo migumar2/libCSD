@@ -113,11 +113,13 @@ If you find bugs or have any issue with library, please ask us. Enjoy the
 library and if you find it useful for your research, please cite our paper:
 
 @inproceeding{BCCMPN11,
-  author = "N. Brisaboa and R. C{\'a}novas and F. Claude and M. Mart{\'{\i}}nez-Prieto and G. Navarro",
-  title = "Compressed String Dictionaries",
-  booktitle = "Proc. 10th International Symposium on Experimental Algorithms (SEA)",
-  year = "2011",
-  series = "LNCS 6630",
-  pages = "136--147"
+  author    = "N. Brisaboa and R. C{\'a}novas and F. Claude 
+                and M.A. Mart{\'{\i}}nez-Prieto and G. Navarro",
+  title     = "Compressed String Dictionaries",
+  booktitle = "Proc. 10th International Symposium on Experimental 
+	        Algorithms (SEA)",
+  year      = "2011",
+  series    = "LNCS 6630",
+  pages     = "136--147"
 }
 
