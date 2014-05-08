@@ -50,7 +50,7 @@ using namespace cds_static;
  * commercial purposes.
  *
  * @author Francisco Claude
- * @email fclaude@cs.uwaterloo.ca
+ * @email  fclaude@recoded.cl
  */
 class XBW {
 public:

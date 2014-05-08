@@ -21,7 +21,7 @@
  *
  *
  * Contacting the authors:
- *   Francisco Claude:  	fclaude@cs.uwaterloo.ca
+ *   Francisco Claude:  	fclaude@recoded.cl
  *   Rodrigo Canovas:  		rcanovas@student.unimelb.edu.au
  *   Miguel A. Martinez-Prieto:	migumar2@infor.uva.es
  */
