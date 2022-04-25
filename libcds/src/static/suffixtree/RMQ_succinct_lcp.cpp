@@ -115,7 +115,10 @@ namespace cds_static{
 		return c;
 	}
 
-	const DTsucc RMQ_succinct_lcp::HighestBitsSet[8] = {~0, ~1, ~3, ~7, ~15, ~31, ~63, ~127};
+	const DTsucc RMQ_succinct_lcp::HighestBitsSet[8] = {
+		DTsucc(~0), DTsucc(~1), DTsucc(~3), DTsucc(~7),
+		DTsucc(~15), DTsucc(~31), DTsucc(~63), DTsucc(~127)
+	};
 
 	DTsucc RMQ_succinct_lcp::clearbits(DTsucc n, uint x) {
 			return n & HighestBitsSet[x];
