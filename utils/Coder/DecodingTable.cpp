@@ -84,7 +84,7 @@ DecodingTable::setDecodingTable(uint k, DecodeableSubstr* substrs)
 		{
 			// Checking the available space in the stream 
 			// and realloc if required
-			while ((bytesStream+substrs[i].dbits+1) > reservedStream)
+			while ((bytesStream+substrs[i].dbits+substrs[i].length+1) > reservedStream)
 				reservedStream = Reallocate(&stream, reservedStream);
 
 			if (substrs[i].length > 0)

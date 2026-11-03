@@ -156,6 +156,10 @@ StringDictionaryHTFC::StringDictionaryHTFC(IteratorDictString *it, uint bucketsi
 							// The last element is directly padded
 							codeSubstr = (codeSubstr << (TABLEBITSO-ptrSubstr));
 							ptrSubstr = TABLEBITSO;
+
+							// The decoder reads this padding up to two bytes past the header
+							textStrings[bytesStrings] = 0; textStrings[bytesStrings+1] = 0;
+							bytesStrings++;
 							break;
 						}
 
