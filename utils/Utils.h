@@ -48,6 +48,22 @@ using namespace cds_utils;
 
 static const size_t NORESULT = 0;
 
+/** Copies 'len' bytes from 'src' on, in a stream ending at 'end'. A query can be
+    longer than what follows a header: the bytes past the end are copied as 0.
+*/
+inline void
+copyFromStream(uchar *dest, uchar *src, uchar *end, size_t len)
+{
+	size_t available = end-src;
+
+	if (available < len)
+	{
+		memcpy(dest, src, available);
+		memset(dest+available, 0, len-available);
+	}
+	else memcpy(dest, src, len);
+}
+
 /* Hash-based dictionaries */
 static const uint32_t HASHHF      = 11; 	// Familiy of Hash-Huffman dictionaries
 static const uint32_t HASHUFFDAC  = 114; 	// HashDAC-Huffman dictionary
