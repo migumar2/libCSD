@@ -51,9 +51,9 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 	{
 		cerr << "[WARNING] The bucketsize value must be greater than 1. ";
 		cerr << "The dictionary is built using buckets of size 2" << endl;
-		this->bucketsize = 2;
+		bucketsize = 2;
 	}
-	else this->bucketsize = bucketsize;
+	this->bucketsize = bucketsize;
 
 	// 1) Bulding the Front-Coding representation
 	StringDictionaryPFC *dict = new StringDictionaryPFC(it, this->bucketsize);

@@ -50,9 +50,9 @@ StringDictionaryPFC::StringDictionaryPFC(IteratorDictString *it, uint bucketsize
 	{
 		cerr << "[WARNING] The bucketsize value must be greater than 1. ";
 		cerr << "The dictionary is built using buckets of size 2" << endl;
-		this->bucketsize = 2;
+		bucketsize = 2;
 	}
-	else this->bucketsize = bucketsize;
+	this->bucketsize = bucketsize;
 
 	this->buckets = 0;
 	this->bytesStrings = 0;
