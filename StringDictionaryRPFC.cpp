@@ -156,7 +156,7 @@ StringDictionaryRPFC::StringDictionaryRPFC(IteratorDictString *it, uint bucketsi
 		}
 	}
 
-	beginnings[1+strings/(bucketsize-1)] = ibytes;
+	beginnings[buckets] = ibytes;
 	delete [] rpdict;
 
 	// 3) Compressing the dictionary
@@ -316,7 +316,7 @@ StringDictionaryRPFC::locatePrefix(uchar *str, uint strLen)
 	// Locating the candidate buckets for the prefix
 	locateBoundaryBuckets(str, strLen, &leftBucket, &rightBucket);
 
-	if (leftBucket > NORESULT)
+	if ((leftBucket > NORESULT) && (buckets > 0))
 	{
 		uchar *decoded; uint decLen;
 		uchar *ptr = getHeader(leftBucket, &decoded, &decLen);
@@ -502,7 +502,7 @@ StringDictionaryRPFC::getHeader(size_t idbucket, uchar **str, uint *strLen)
 bool 
 StringDictionaryRPFC::locateBucket(uchar *str, size_t *idbucket)
 {
-	size_t left = 1, right = buckets, center = 0;
+	size_t left = 1, right = buckets, center = 1;
 	int cmp = 0;
 
 	while (left <= right)

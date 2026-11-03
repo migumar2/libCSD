@@ -78,6 +78,9 @@ size_t LogSequence::getField(size_t position)
     throw "Trying to get an element bigger than the array.";
   }
 
+  // A field of no bits holds 0, and the array may hold no word at all
+  if (numbits == 0) return 0;
+
   return get_field(&array[0], numbits, position);
 }
 
@@ -95,7 +98,7 @@ void LogSequence::setField(size_t position, size_t value)
     throw "Trying to insert a value bigger that expected. Please increase numbits when creating the data structure.";
   }
 
-  set_field(array, numbits, position, value);
+  if (numbits > 0) set_field(array, numbits, position, value);
 }
 
 size_t LogSequence::getSize()

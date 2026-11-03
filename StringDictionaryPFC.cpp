@@ -223,7 +223,7 @@ StringDictionaryPFC::locatePrefix(uchar *str, uint strLen)
 	// Locating the candidate buckets for the prefix
 	locateBoundaryBuckets(str, strLen, &leftBucket, &rightBucket);
 
-	if (leftBucket > NORESULT)
+	if ((leftBucket > NORESULT) && (buckets > 0))
 	{
 		uchar *decoded; uint decLen;
 		uchar *ptr = getHeader(leftBucket, &decoded, &decLen);
@@ -407,7 +407,7 @@ StringDictionaryPFC::decodeNextString(uchar **ptr, uint lenPrefix, uchar *str, u
 bool 
 StringDictionaryPFC::locateBucket(uchar *str, size_t *idbucket)
 {
-	size_t left = 1, right = buckets, center = 0;
+	size_t left = 1, right = buckets, center = 1;
 	int cmp = 0;
 
 	while (left <= right)

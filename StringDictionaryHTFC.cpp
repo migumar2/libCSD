@@ -412,7 +412,7 @@ StringDictionaryHTFC::locatePrefix(uchar *str, uint strLen)
 
 	IteratorDictIDContiguous *itResult;
 
-	if (leftBucket > NORESULT)
+	if ((leftBucket > NORESULT) && (buckets > 0))
 	{
 		ChunkScan c = decodeHeader(leftBucket);
 		resetScan(&c, leftBucket);
@@ -625,7 +625,7 @@ StringDictionaryHTFC::decodeHeader(size_t idbucket)
 bool 
 StringDictionaryHTFC::locateBucket(uchar *str, uint strLen, size_t *idbucket)
 {
-	size_t left = 1, right = buckets, center = 0;
+	size_t left = 1, right = buckets, center = 1;
 	int cmp = 0;
 
 	uchar *header;
