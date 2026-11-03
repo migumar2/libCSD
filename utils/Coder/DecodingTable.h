@@ -197,7 +197,33 @@ struct ChunkScan {
 	uint strLen;		// String length
 	uint advanced;		// Number of bytes extracted in advance
 	uint extracted;		// Tells the number of extracted chars
+	bool vbyte;		// Tells if the string VByte is not fully extracted
 };
+
+/** Skips the VByte bytes, whose 0s do not end the string, still expected by a
+    scan at the beginning of a sequence of extracted chars.
+    @param c: pointer to the scanning data.
+    @param chars: the extracted chars.
+    @param length: the number of extracted chars.
+    @returns the number of skipped chars.
+*/
+inline uint skipVByte(ChunkScan *c, const uchar *chars, uint length)
+{
+	uint skipped = 0;
+
+	if (c->vbyte)
+	{
+		while ((skipped < length) && !(chars[skipped] & 0x80)) skipped++;
+
+		if (skipped < length)
+		{
+			skipped++;
+			c->vbyte = false;
+		}
+	}
+
+	return skipped;
+}
 
 class DecodingTable
 {	

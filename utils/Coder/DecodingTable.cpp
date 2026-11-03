@@ -147,6 +147,8 @@ DecodingTable::getSubstring(ChunkScan *c)
 		for (uint i=0; i<x.length; i++) { c->str[c->strLen+i] = stream[position+i]; }
 		c->extracted += x.length;
 
+		uint skipped = skipVByte(c, &(stream[position]), x.length);
+
 		if (c->extracted <= 2)
 		{
 			c->strLen += x.length;
@@ -157,17 +159,21 @@ DecodingTable::getSubstring(ChunkScan *c)
 		{
 			if (endings->getBit(index))
 			{
-				uint substrLen = strlen((char*)&(stream[position]))+1;
+				uint substrLen = skipped;
+				while ((substrLen < x.length) && (stream[position+substrLen] != 0)) substrLen++;
 
-				c->strLen += substrLen;
-				c->advanced = x.length-substrLen;
-				return true;
+				if (substrLen < x.length)
+				{
+					substrLen++;
+
+					c->strLen += substrLen;
+					c->advanced = x.length-substrLen;
+					return true;
+				}
 			}
-			else
-			{
-				c->strLen += x.length;
-				return false;
-			}
+
+			c->strLen += x.length;
+			return false;
 		}
 
 	}
@@ -203,6 +209,9 @@ DecodingTable::getSubstring(ChunkScan *c)
 		c->str[c->strLen] = node.symbol; 
 		c->strLen++;
 		c->extracted++;
+
+		uchar symbol = node.symbol;
+		if (skipVByte(c, &symbol, 1) > 0) return false;
 
 		if (node.symbol == 0) return true;
 		else return false;
