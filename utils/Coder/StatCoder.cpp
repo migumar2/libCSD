@@ -78,6 +78,7 @@ uint
 StatCoder::decodeString(ChunkScan* c)
 {
 	c->extracted = 0;
+	c->vbyte = true;
 
 	uint prevLen = c->strLen;
 	uint nextLen = 0;
@@ -90,7 +91,8 @@ StatCoder::decodeString(ChunkScan* c)
 	{
 		// Checking if a full string is encoded in these advanced chars
 		c->str[prevLen+c->advanced] = 0;
-		nextLen = strlen((char*)(c->str+prevLen));
+		nextLen = skipVByte(c, c->str+prevLen, c->advanced);
+		nextLen += strlen((char*)(c->str+prevLen+nextLen));
 
 		if ((nextLen < c->advanced) && (nextLen > 0))
 		{
@@ -131,7 +133,7 @@ StatCoder::decodeString(ChunkScan* c)
 
 	// Extracts, at least, the two first bytes because represent the VByte
 	// encoding of the prefix length
-	while ((c->strLen-prevLen) < 2) end = table->processChunk(c);
+	while (c->vbyte || ((c->strLen-prevLen) < 2)) end = table->processChunk(c);
 
 	// Appends the extracted chars before the common prefix
 	uint extracted = c->strLen-prevLen;

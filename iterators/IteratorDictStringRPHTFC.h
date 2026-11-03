@@ -163,7 +163,7 @@ class IteratorDictStringRPHTFC : public IteratorDictString
 
 		inline void decodeHeader()
 		{
-			chunk.strLen = 0;  chunk.advanced = 0; chunk.extracted = 1;
+			chunk.strLen = 0;  chunk.advanced = 0; chunk.extracted = 1; chunk.vbyte = false;
 			chunk.c_chunk = 0; chunk.c_valid = 0;chunk.b_remain = maxcomplength;
 			chunk.b_ptr = ptr+blStrings->getField(bucket); bucket++;
 			offset = 0;

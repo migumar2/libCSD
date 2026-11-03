@@ -158,7 +158,7 @@ class IteratorDictStringHHTFC : public IteratorDictString
 
 		inline void decodeHeader()
 		{
-			chunk.strLen = 0; chunk.advanced = 0; chunk.extracted = 1;
+			chunk.strLen = 0; chunk.advanced = 0; chunk.extracted = 1; chunk.vbyte = false;
 			chunk.c_chunk = 0; chunk.c_valid = 0;chunk.b_remain = maxcomplength;
 
 			// Variables used for adjusting purposes
@@ -195,6 +195,7 @@ class IteratorDictStringHHTFC : public IteratorDictString
 		inline void decodeNextString()
 		{
 			chunk.extracted = 0;
+			chunk.vbyte = true;
 
 			uint prevLen = chunk.strLen;
 			uint nextLen = 0;
@@ -205,7 +206,8 @@ class IteratorDictStringHHTFC : public IteratorDictString
 			{
 				// Checking if a full string is encoded in these advanced chars
 				chunk.str[prevLen+chunk.advanced] = 0;
-				nextLen = strlen((char*)(chunk.str+prevLen));
+				nextLen = skipVByte(&chunk, chunk.str+prevLen, chunk.advanced);
+				nextLen += strlen((char*)(chunk.str+prevLen+nextLen));
 
 				if ((nextLen < chunk.advanced) && (nextLen > 0))
 				{
@@ -242,7 +244,7 @@ class IteratorDictStringHHTFC : public IteratorDictString
 
 			// Extracts, at least, the two first bytes because represent the VByte
 			// encoding of the prefix length
-			while ((chunk.strLen-prevLen) < 2) end = tableHU->processChunk(&chunk);
+			while (chunk.vbyte || ((chunk.strLen-prevLen) < 2)) end = tableHU->processChunk(&chunk);
 
 			// Appends the extracted chars before the common prefix
 			uint extracted = chunk.strLen-prevLen;
