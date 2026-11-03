@@ -77,7 +77,9 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 	uint bucket = 1; uint buckets = dict->buckets;
 	size_t ptrpdict = 0;
 
-	uint ends = 0;
+	// Where the strings end in rpdict: the 0s in a VByte are values, and Re-Pair
+	// leaves every 0 where it is.
+	vector<uint> ends;
 
 	while (bucket <= buckets)
 	{
@@ -101,22 +103,28 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 		if ((ptrpdict+(size_t)(bucketsize*maxlength)) > reservedInts)
 			reservedInts = Reallocate(&rpdict, reservedInts);
 
-		// Stores the last position with 0 to avoid confusions with 0 values encoding VBytes.
-		uint zero = pbeg-1;
+		// Tells a string end from the 0 values encoding VBytes.
+		bool vbyte = true;
 
 		// Extracting the internal strings for Re-Pair compression
 		for (; pbeg < pend; pbeg++)
 		{
 			int c = (int)(dict->textStrings[pbeg]);
 
-			if ((c != 0) || ((c == 0) && (pbeg == zero+1))) rpdict[ptrpdict] = c;
+			if (vbyte)
+			{
+				rpdict[ptrpdict] = c;
+				vbyte = ((c & 0x80) == 0);
+			}
+			else if (c != 0) rpdict[ptrpdict] = c;
 			else
 			{
-				zero = pbeg; ends++;
+				vbyte = true;
 
 				rpdict[ptrpdict] = 255;
 				ptrpdict++;
 				rpdict[ptrpdict] = 0; 
+				ends.push_back(ptrpdict);
 			}
 
 			ptrpdict++;
@@ -143,15 +151,15 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 	size_t ibytes = 0;
 	uint io = 0, strings = 0;
 	beginnings[0] = 0;
-	uint zero = 0;
+	size_t nextend = 0;
 
 	while (io<ptrpdict)
 	{
 		if (rpdict[io] >= 0)
 		{
-			if ((rpdict[io] == 0) && (io > zero+1))
+			if ((nextend < ends.size()) && (io == ends[nextend]))
 			{
-				zero = io;
+				nextend++;
 				strings++; io++;
 
 				if ((strings % (bucketsize-1)) == 0)
@@ -837,7 +845,7 @@ StringDictionaryRPHTFC::decodeString(uchar *str, uint *strLen, uchar **ptr, uint
 	uint rule;
 
 	// The VByte is firstly extracted
-	while (read < 2)
+	while ((read < 2) || !VByte::complete(vb, read))
 	{
 		*ptr += decodeSymbol(&rule, *ptr, offset);
 

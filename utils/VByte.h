@@ -57,6 +57,13 @@ class VByte
 	@returns the number of bytes read for decoding.
     */
     static uint decode(uint *c, uchar *r);
+
+    /** Checks if the first 'len' bytes of 'r' hold a whole encoded integer.
+	@param r: the sequence to be checked.
+	@param len: the number of bytes available in the sequence.
+	@returns true if a byte with the stop bit is among them.
+    */
+    static bool complete(uchar *r, uint len);
 };
 
 #endif  /* _VBYTE_H */
