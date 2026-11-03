@@ -169,7 +169,7 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 		}
 	}
 
-	beginnings[1+strings/(bucketsize-1)] = ibytes;
+	beginnings[buckets] = ibytes;
 	delete [] rpdict;
 
 	// 3) Compressing the dictionary and building the decoding table
