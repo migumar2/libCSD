@@ -635,7 +635,9 @@ StringDictionaryHTFC::locateBucket(uchar *str, uint strLen, size_t *idbucket)
 		center = (left+right)/2;
 		header = getHeader(center);
 
-		cmp = memcmp(header, str, strLen);
+		// Two codes differ within the shorter one, so a compare needs no byte past the stream
+		size_t available = (textStrings+bytesStrings)-header;
+		cmp = memcmp(header, str, (available < strLen) ? available : strLen);
 
 		// The string is in any preceding bucket
 		if (cmp > 0) right = center-1;
@@ -671,7 +673,7 @@ StringDictionaryHTFC::locateBoundaryBuckets(uchar *str, uint strLen, uint offset
 	{
 		center = (*left+*right)/2;
 
-		memcpy(header, getHeader(center), strLen);
+		copyFromStream(header, getHeader(center), textStrings+bytesStrings, strLen);
 		if (offset != 0) header[strLen-1] = header[strLen-1] & cmask;
 		cmp = memcmp(header, str, strLen);
 
@@ -699,7 +701,7 @@ StringDictionaryHTFC::locateBoundaryBuckets(uchar *str, uint strLen, uint offset
 		{
 			lc = (ll+lr)/2;
 
-			memcpy(header, getHeader(lc), strLen);
+			copyFromStream(header, getHeader(lc), textStrings+bytesStrings, strLen);
 			if (offset != 0) header[strLen-1] = header[strLen-1] & cmask;
 		    cmp = memcmp(header, str, strLen);
 
@@ -720,7 +722,7 @@ StringDictionaryHTFC::locateBoundaryBuckets(uchar *str, uint strLen, uint offset
 		{
 			rc = (rl+rr)/2;
 
-			memcpy(header, getHeader(rc), strLen);
+			copyFromStream(header, getHeader(rc), textStrings+bytesStrings, strLen);
 			if (offset != 0) header[strLen-1] = header[strLen-1] & cmask;
 			cmp = memcmp(header, str, strLen);
 
