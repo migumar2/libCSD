@@ -30,6 +30,9 @@ Build:
 Test:	
 	$(CPP) $(FLAGS) -o Test Test.o $(OBJECTS) ${LIB}
  
+tests/%: tests/%.cpp $(OBJECTS)
+	$(CPP) $(FLAGS) -I . -o $@ $< $(OBJECTS) ${LIB}
+
 
 clean:
 	@echo " [CLN] Removing object files"
