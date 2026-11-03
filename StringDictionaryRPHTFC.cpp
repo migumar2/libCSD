@@ -188,6 +188,7 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 		// the Decoding Table.
 		vector<uchar> textSubstr; vector<ushort> lenSubstr;
 		ushort ptrSubstr=0; uint codeSubstr=0;
+		vector< vector<uchar> > endingSubstrs; vector<size_t> endingBits;
 
 		coderHT = new StatCoder(codewordsHT);
 
@@ -215,6 +216,16 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 			}
 			while (headers[bucket][ptrB-1] != '\0');
 
+			// The last chunk of the header also reads the bits following it
+			if (textSubstr.size() > 0)
+			{
+				endingBits.push_back(8*(bytesStrings+bytes)+offset-ptrSubstr);
+				endingSubstrs.push_back(textSubstr);
+			}
+
+			textSubstr.clear(); lenSubstr.clear();
+			ptrSubstr=0; codeSubstr=0;
+
 			{
 				// Encoding the compressed header length
 				if (offset > 0) bytes++;
@@ -229,54 +240,6 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 			ptrB = beginnings[bucket-1];
 			ptrE = beginnings[bucket]-1;
 
-			// Adding an ending decodeable string  (if required)
-			if (textSubstr.size() > 0)
-			{
-				// #######################
-				// It is necessary to read up to TABLEBITSO bits for indexing the
-				// substring in the DecodingTable
-
-				if (offset > 0)
-				{
-					// The substring is also padded
-					codeSubstr = (codeSubstr << (8-offset));
-					ptrSubstr += (8-offset); offset = 0;
-				}
-
-				if (ptrSubstr > TABLEBITSO)
-				{
-					codeSubstr = codeSubstr >> (ptrSubstr - TABLEBITSO);
-					ptrSubstr = TABLEBITSO;
-				}
-				else
-				{
-					if ((bucket == buckets) && (elements % bucketsize == 0))
-					{
-						// The last element is directly padded
-						codeSubstr = (codeSubstr << (TABLEBITSO-ptrSubstr));
-						ptrSubstr = TABLEBITSO;
-					}
-					else
-					{
-						// The first symbol encoding the internal strings is enough for padding because it uses, at least, 16 bits
-						uint remaining = TABLEBITSO-ptrSubstr;
-						uint codeword =  intStrings[ptrB];
-
-						if (remaining < bitsrp)
-						{
-							codeSubstr = (codeSubstr << remaining) | (codeword >> (bitsrp-remaining));
-						}
-						else
-						{
-							codeSubstr = (codeSubstr << bitsrp) | codeword;
-							codeSubstr = codeSubstr << (remaining-bitsrp);
-						}
-
-						ptrSubstr = TABLEBITSO;
-					}
-				}
-			}
-
 			// Processing the internal strings
 			offset = 0;
 			textStrings[bytesStrings] = 0;
@@ -288,6 +251,26 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 		}
 
 		delete [] tmp;
+
+		// A chunk starting in the last header can read up to two bytes past it
+		while ((bytesStrings+2) > reservedStrings)
+			reservedStrings = Reallocate(&textStrings, reservedStrings);
+
+		textStrings[bytesStrings] = 0; textStrings[bytesStrings+1] = 0;
+		bytesStrings += 2;
+
+		// Adding the ending decodeable strings: the bits following each
+		// header are the ones just written
+		for (size_t i=0; i<endingBits.size(); i++)
+		{
+			size_t byte = endingBits[i]/8;
+
+			codeSubstr = (textStrings[byte] << 16) | (textStrings[byte+1] << 8) | textStrings[byte+2];
+			codeSubstr = codeSubstr >> (8-(endingBits[i]%8));
+			ptrSubstr = TABLEBITSO;
+
+			builderHT->insertEndingSubstr(&codeSubstr, &ptrSubstr, &endingSubstrs[i], &lenSubstr);
+		}
 
 		// bytesStrings++;
 		xblStrings.push_back(bytesStrings+1);

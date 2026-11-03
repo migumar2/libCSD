@@ -186,6 +186,10 @@ StringDictionaryHHTFC::StringDictionaryHHTFC(IteratorDictString *it, uint bucket
 							// The last element is directly padded
 							codeSubstr = (codeSubstr << (TABLEBITSO-ptrSubstr));
 							ptrSubstr = TABLEBITSO;
+
+							// The decoder reads this padding up to two bytes past the header
+							textStrings[bytesStrings] = 0; textStrings[bytesStrings+1] = 0;
+							bytesStrings++;
 							break;
 						}
 
@@ -346,6 +350,15 @@ StringDictionaryHHTFC::StringDictionaryHHTFC(IteratorDictString *it, uint bucket
 		}
 
 		delete [] tmp;
+
+		// Adding the ending decodeable string of the last string (if required)
+		if (textSubstr.size() > 0)
+		{
+			if (((elements-1)%bucketsize) == 0)
+				builderHT->insertEndingSubstr(&codeSubstr, &ptrSubstr, &textSubstr, &lenSubstr);
+			else
+				builderHU->insertEndingSubstr(&codeSubstr, &ptrSubstr, &textSubstr, &lenSubstr);
+		}
 
 		bytesStrings++;
 		xblStrings.push_back(bytesStrings);
