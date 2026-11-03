@@ -184,7 +184,7 @@ class IteratorDictStringRPFC : public IteratorDictString
 			uint rule;
 
 			// The VByte is firstly extracted
-			while (read < 2)
+			while ((read < 2) || !VByte::complete(vb, read))
 			{
 				rule = decodeSymbol();
 

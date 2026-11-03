@@ -73,3 +73,12 @@ VByte::decode(uint *c, uchar *r)
 	return i;
 }
 
+bool
+VByte::complete(uchar *r, uint len)
+{
+	for (uint i=0; i<len; i++)
+		if (r[i] & 0x80) return true;
+
+	return false;
+}
+
