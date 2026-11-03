@@ -192,13 +192,13 @@ StringDictionaryRPFC::StringDictionaryRPFC(IteratorDictString *it, uint bucketsi
 
 			// Updating the ptr value to the beginning of the corresponding internal string
 			ptrB = beginnings[bucket-1];
-			ptrE = beginnings[bucket]-1;
+			ptrE = beginnings[bucket];
 
 			// Processing the internal strings
 			offset = 0;
 			textStrings[bytesStrings] = 0;
 
-			for (; ptrB <= ptrE; ptrB++)
+			for (; ptrB < ptrE; ptrB++)
 				bytesStrings += encodeSymbol(intStrings[ptrB], &(textStrings[bytesStrings]), &offset);
 
 			if (offset > 0) bytesStrings++;
