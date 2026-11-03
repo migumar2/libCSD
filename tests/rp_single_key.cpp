@@ -1,6 +1,8 @@
 /* Regression test: with a single key no bucket holds an internal string, the end
- * of the first bucket minus 1 wraps around, and the RPFC constructor walks off
- * the empty vector of symbols.
+ * of the first bucket minus 1 wraps around, and the RPFC and RPHTFC constructors
+ * walk off the empty vector of symbols.
+ *
+ * RPHTFC is only built here, to stay clear of another defect.
  *
  *   make tests/rp_single_key && tests/rp_single_key
  */
@@ -89,7 +91,10 @@ int main()
 	keys.push_back("alpha");
 
 	for (size_t b=0; b<sizeof(buckets)/sizeof(buckets[0]); b++)
+	{
 		check(new StringDictionaryRPFC(plain(keys), buckets[b]), keys, "RPFC");
+		delete new StringDictionaryRPHTFC(plain(keys), buckets[b]);
+	}
 
 	remove(PATH);
 	printf("ok\n");
