@@ -98,7 +98,8 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 		freqs[0]++; pbeg++;
 		bucket++;
 
-		if ((ptrpdict+(size_t)(bucketsize*maxlength)) > reservedInts)
+		// A byte takes an int, and the end of a string takes two
+		while ((ptrpdict+(pend-pbeg)+bucketsize) > reservedInts)
 			reservedInts = Reallocate(&rpdict, reservedInts);
 
 		// Stores the last position with 0 to avoid confusions with 0 values encoding VBytes.
@@ -195,7 +196,8 @@ StringDictionaryRPHTFC::StringDictionaryRPHTFC(IteratorDictString *it, uint buck
 		{
 			// Checking the available space in textStrings and 
 			// realloc if required
-			while ((bytesStrings+(bucketsize*1000)) > reservedStrings)
+			// The header takes up to 4 bytes per char, as in tmp, followed by bitsrp bits per symbol
+			while ((bytesStrings+4*headers[bucket].size()+((beginnings[bucket]-beginnings[bucket-1])*bitsrp)/8+2) > reservedStrings)
 				reservedStrings = Reallocate(&textStrings, reservedStrings);
 
 			bytes = 0; tmp[bytes] = 0; offset = 0;

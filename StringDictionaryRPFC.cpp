@@ -92,7 +92,8 @@ StringDictionaryRPFC::StringDictionaryRPFC(IteratorDictString *it, uint bucketsi
 		{
 			// Extracting the internal strings for Re-Pair compression
 
-			if ((ptrpdict+(size_t)(bucketsize*maxlength)) > reservedInts)
+			// A byte takes an int, and the end of a string takes two
+			while ((ptrpdict+(pend-pbeg)+bucketsize) > reservedInts)
 				reservedInts = Reallocate(&rpdict, reservedInts);
 
 			// Stores the last position with 0 to avoid confusions with 0 values encoding VBytes.
@@ -175,7 +176,8 @@ StringDictionaryRPFC::StringDictionaryRPFC(IteratorDictString *it, uint bucketsi
 		{
 			// Checking the available space in textStrings and 
 			// realloc if required
-			while ((bytesStrings+(bucketsize*1000)) > reservedStrings)
+			// The header is copied as it is, followed by bitsrp bits per symbol
+			while ((bytesStrings+headers[bucket].size()+((beginnings[bucket]-beginnings[bucket-1])*bitsrp)/8+2) > reservedStrings)
 				reservedStrings = Reallocate(&textStrings, reservedStrings);
 
 			bytes = 0; tmp[bytes] = 0; offset = 0;
